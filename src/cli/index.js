@@ -16,6 +16,9 @@ import { fileURLToPath } from 'url';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
+const pkgPath = path.resolve(__dirname, '../../package.json');
+const pkg = JSON.parse(fs.readFileSync(pkgPath, 'utf-8'));
+
 const orange = chalk.hex('#FF6B35');
 const green = chalk.hex('#16C784');
 const dim = chalk.dim;
@@ -25,7 +28,7 @@ const program = new Command();
 program
   .name('cashclaw')
   .description('Turn your OpenClaw AI agent into a freelance business')
-  .version('1.0.0', '-v, --version');
+  .version(pkg.version, '-v, --version');
 
 // ─── cashclaw init ─────────────────────────────────────────────────────
 program

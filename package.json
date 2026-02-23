@@ -1,6 +1,6 @@
 {
   "name": "cashclaw",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "Turn your OpenClaw into a money-making machine",
   "type": "module",
   "bin": {
