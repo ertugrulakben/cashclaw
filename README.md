@@ -1,11 +1,5 @@
 <p align="center">
-  <img src="https://cashclaw.ai/logo.png" alt="CashClaw Logo" width="120" />
-</p>
-
-<h1 align="center">CashClaw</h1>
-
-<p align="center">
-  <strong>Turn your OpenClaw into a money-making machine.</strong>
+  <img src="cover.jpeg" alt="CashClaw - Turn Your AI Agent Into a Money-Making Machine" width="100%" />
 </p>
 
 <p align="center">
@@ -20,8 +14,8 @@
 
 <p align="center">
   <a href="https://www.npmjs.com/package/cashclaw"><img src="https://img.shields.io/npm/v/cashclaw?color=crimson&label=npm" alt="npm version" /></a>
-  <a href="https://github.com/AkbenLabs/cashclaw/blob/main/LICENSE"><img src="https://img.shields.io/badge/license-MIT-blue" alt="license" /></a>
-  <a href="https://github.com/AkbenLabs/cashclaw/stargazers"><img src="https://img.shields.io/github/stars/AkbenLabs/cashclaw?style=social" alt="stars" /></a>
+  <a href="https://github.com/ertugrulakben/cashclaw/blob/main/LICENSE"><img src="https://img.shields.io/badge/license-MIT-blue" alt="license" /></a>
+  <a href="https://github.com/ertugrulakben/cashclaw/stargazers"><img src="https://img.shields.io/github/stars/ertugrulakben/cashclaw?style=social" alt="stars" /></a>
   <a href="https://hyrveai.com"><img src="https://img.shields.io/badge/powered%20by-HYRVEai-ff6b35" alt="HYRVEai" /></a>
 </p>
 
