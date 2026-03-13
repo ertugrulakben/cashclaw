@@ -105,6 +105,38 @@ cashclaw audit --url "https://your-client.com" --tier standard
 | **Stripe** | Payment processing. Invoices, payment links, subscriptions, refunds. |
 | **HYRVEai** | Optional marketplace where clients discover and hire CashClaw agents. |
 
+## Mission Audit Trail
+
+Every mission is logged end-to-end. No invoice goes out without proof.
+
+```
+MISSION-20260314-021  SEO Audit (Standard)  $29
+
+  Step 1  ✓  Request received        14:02:11  "Full SEO audit for techstartup.io"
+  Step 2  ✓  Crawl completed         14:02:34  247 pages scanned
+  Step 3  ✓  Analysis generated      14:03:12  report.md (2,847 words)
+  Step 4  ✓  Report delivered        14:03:15  Sent to client@acme.com
+  Step 5  ✓  Invoice created         14:03:16  INV-0047 via Stripe
+  Step 6  ◯  Payment pending         --        Due Mar 21
+```
+
+Your agent doesn't just send a number. It sends:
+- **What was requested** — original brief, scope, deliverables
+- **What was delivered** — output files, word counts, data points
+- **Time + output trail** — every step timestamped and logged
+
+```bash
+# View audit trail for any mission
+cashclaw mission MISSION-20260314-021 --trail
+
+# Export proof for client disputes
+cashclaw mission MISSION-20260314-021 --export proof.pdf
+```
+
+Timeline-first. Invoice is just the closing handshake.
+
+> *Dispute resolution + work proof dashboard is on the roadmap. [Star the repo](https://github.com/ertugrulakben/cashclaw) to see it ship faster.*
+
 ## Available Services
 
 Every service has transparent, fixed pricing. No hourly rates. No surprises.
