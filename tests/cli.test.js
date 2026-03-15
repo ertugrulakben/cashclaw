@@ -1,8 +1,10 @@
 import assert from 'node:assert';
-import { describe, it, before, after } from 'node:test';
+import { describe, it, before, after, afterEach } from 'node:test';
 import fs from 'fs-extra';
 import path from 'path';
 import os from 'os';
+import { exec } from 'child_process';
+import http from 'http';
 
 // ─── Test Setup ────────────────────────────────────────────────────────
 
@@ -500,6 +502,48 @@ describe('Skills', () => {
     }
   });
 });
+
+// ─── Dashboard Command Tests ──────────────────────────────────────────
+
+describe('Dashboard Port Collision', () => {
+  let children = [];
+
+  // Cleanup after each test to ensure ports are freed
+  afterEach(() => {
+    children.forEach(child => child.kill());
+    children = [];
+  });
+
+  it('should successfully increment ports up to the limit', async (t) => {
+    const ports = [];
+    
+    // Helper to start an instance and return the port
+    const startInstance = () => new Promise((resolve) => {
+      const child = exec('node bin/cashclaw.js dashboard --no-open');
+      children.push(child);
+      
+      const onData = (data) => {
+        const match = data.toString().match(/localhost:(\d+)/);
+        if (match) {
+            child.stderr.removeListener('data', onData);
+            child.stdout.removeListener('data', onData);
+            resolve(parseInt(match[1], 10));
+        }
+      }
+      child.stdout.on('data', onData);
+      child.stderr.on('data', onData);
+    });
+
+    // Test 3 instances to verify multiple recursions
+    ports[0] = await startInstance();
+    ports[1] = await startInstance();
+    ports[2] = await startInstance();
+
+    assert.strictEqual(ports[1], ports[0] + 1);
+    assert.strictEqual(ports[2], ports[1] + 1);
+  });
+});
+
 
 // ─── Summary ───────────────────────────────────────────────────────────
 
