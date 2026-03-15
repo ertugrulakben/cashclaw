@@ -9,11 +9,32 @@ const orange = chalk.hex('#FF6B35');
 const green = chalk.hex('#16C784');
 const dim = chalk.dim;
 
+/**
+ * Recursively attempts to start the server on the given port.
+ * If the port is in use, it increments and tries again.
+ */
+async function startServer(app, port, host, limit = 10) {
+  return new Promise((resolve, reject) => {
+    const server = app.listen(port, host, () => {
+      resolve({ server, usedPort: port });
+    });
+
+    server.on('error', (err) => {
+      if (err.code === 'EADDRINUSE' && limit > 0) {
+        // Port taken, try the next one
+        resolve(startServer(app, port + 1, host, limit - 1));
+      } else {
+        reject(err);
+      }
+    });
+  });
+}
+
 export async function runDashboard(options = {}) {
   showMiniBanner();
 
   const config = await loadConfig();
-  const port = options.port || config.server.port || 3847;
+  const startPort = options.port || config.server.port || 3847; //
   const host = config.server.host || 'localhost';
 
   const spinner = ora('Starting dashboard server...').start();
@@ -21,21 +42,15 @@ export async function runDashboard(options = {}) {
   try {
     const app = createDashboardServer();
 
-    await new Promise((resolve, reject) => {
-      const server = app.listen(port, host, () => {
-        resolve(server);
-      });
-      server.on('error', (err) => {
-        if (err.code === 'EADDRINUSE') {
-          reject(new Error(`Port ${port} is already in use. Try: cashclaw dashboard --port ${port + 1}`));
-        } else {
-          reject(err);
-        }
-      });
-    });
+    // CALL THE HELPER HERE
+    const { server, usedPort } = await startServer(app, startPort, host);
 
-    const url = `http://${host}:${port}`;
+    const url = `http://${host}:${usedPort}`;
     spinner.succeed(`Dashboard running at ${green.bold(url)}`);
+    
+    if (usedPort !== startPort) {
+      console.log(dim(`  (Note: Port ${startPort} was busy, switched to ${usedPort})`));
+    }
 
     console.log();
     console.log(`  ${orange('API Endpoints:')}`);
