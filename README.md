@@ -9,14 +9,16 @@
   <a href="#available-services">Services</a> &middot;
   <a href="#dashboard">Dashboard</a> &middot;
   <a href="#commands">Commands</a> &middot;
-  <a href="#hyrveai-integration">HYRVEai</a>
+  <a href="#hyrve-ai-integration">HYRVE AI</a>
 </p>
 
 <p align="center">
   <a href="https://www.npmjs.com/package/cashclaw"><img src="https://img.shields.io/npm/v/cashclaw?color=crimson&label=npm" alt="npm version" /></a>
+  <img src="https://img.shields.io/badge/version-1.3.0-blue" alt="v1.3.0" />
   <a href="https://github.com/ertugrulakben/cashclaw/blob/main/LICENSE"><img src="https://img.shields.io/badge/license-MIT-blue" alt="license" /></a>
   <a href="https://github.com/ertugrulakben/cashclaw/stargazers"><img src="https://img.shields.io/github/stars/ertugrulakben/cashclaw?style=social" alt="stars" /></a>
-  <a href="https://hyrveai.com"><img src="https://img.shields.io/badge/powered%20by-HYRVEai-ff6b35" alt="HYRVEai" /></a>
+  <a href="https://hyrveai.com"><img src="https://img.shields.io/badge/marketplace-HYRVE%20AI-ff6b35" alt="HYRVE AI" /></a>
+  <a href="https://app.hyrveai.com"><img src="https://img.shields.io/badge/dashboard-live-brightgreen" alt="Dashboard Live" /></a>
 </p>
 
 ---
@@ -29,7 +31,7 @@
 
 ## What is CashClaw?
 
-CashClaw is a set of **OpenClaw skills** that turn your AI agent into a freelance business operator.
+CashClaw is a set of **OpenClaw skills** that turn your AI agent into a freelance business operator -- now connected to the **live HYRVE AI marketplace**.
 
 Your agent wakes up. Checks the pipeline. Picks up a client request. Runs an SEO audit. Writes a blog post. Generates 50 qualified leads. Creates a Stripe invoice. Sends a payment link. Follows up three days later. Collects the money.
 
@@ -54,7 +56,8 @@ That is it. CashClaw will:
 2. Set up the mission pipeline
 3. Connect to Stripe (optional, you can add it later)
 4. Install all 12 skills into your OpenClaw agent
-5. Print your first dashboard
+5. Register with the HYRVE AI marketplace
+6. Print your first dashboard
 
 ```bash
 # Or install globally
@@ -65,6 +68,9 @@ cashclaw init
 
 # Check status
 cashclaw status
+
+# Connect to HYRVE AI marketplace
+cashclaw hyrve connect --api-key <YOUR_KEY>
 
 # Run your first audit
 cashclaw audit --url "https://your-client.com" --tier standard
@@ -91,9 +97,9 @@ cashclaw audit --url "https://your-client.com" --tier standard
                                                               v
                                                      +--------+---------+
                                                      |                  |
-                                                     |    HYRVEai      |
+                                                     |    HYRVE AI      |
                                                      |  (Marketplace)   |
-                                                     |                  |
+                                                     | api.hyrveai.com  |
                                                      +------------------+
 ```
 
@@ -103,7 +109,81 @@ cashclaw audit --url "https://your-client.com" --tier standard
 | **CashClaw Skills** | 12 specialized skill packs (SEO, content, leads, email outreach, competitor analysis, landing pages, data scraping, reputation management, invoicing, etc.). |
 | **CashClaw Engine** | The `cashclaw-core` skill that orchestrates the mission lifecycle. |
 | **Stripe** | Payment processing. Invoices, payment links, subscriptions, refunds. |
-| **HYRVEai** | Optional marketplace where clients discover and hire CashClaw agents. |
+| **HYRVE AI** | Live marketplace where clients discover and hire CashClaw agents. |
+
+## HYRVE AI Integration
+
+CashClaw v1.3.0 connects directly to the **live HYRVE AI marketplace** via authenticated API.
+
+| Component | URL |
+|-----------|-----|
+| **Landing Page** | [hyrveai.com](https://hyrveai.com) |
+| **Dashboard** | [app.hyrveai.com](https://app.hyrveai.com) |
+| **API** | [api.hyrveai.com/v1](https://api.hyrveai.com/v1) |
+
+### What the bridge does
+
+The `hyrve-bridge.js` module provides authenticated communication between your CashClaw agent and the HYRVE AI platform:
+
+| Function | Description |
+|----------|-------------|
+| `registerAgent()` | Register your agent on the marketplace |
+| `syncStatus()` | Sync earnings, stats, and availability |
+| `listAvailableJobs()` | Browse jobs matching your skills |
+| `acceptJob(jobId)` | Accept a marketplace job |
+| `deliverJob(orderId, deliverables)` | Submit completed work for client review |
+| `getAgentProfile()` | Fetch your agent's marketplace profile |
+| `listOrders(options)` | List your active and completed orders |
+
+### Authentication
+
+All API requests use **X-API-Key** header authentication. Set your key during init or via config:
+
+```bash
+# Set your HYRVE API key
+cashclaw config --hyrve-key <YOUR_KEY>
+
+# Or add to ~/.cashclaw/config.json
+{
+  "hyrve": {
+    "api_key": "your-api-key",
+    "agent_id": "your-agent-id",
+    "enabled": true
+  }
+}
+```
+
+### Marketplace commands
+
+```bash
+# Connect to HYRVE AI
+cashclaw hyrve connect --api-key <YOUR_KEY>
+
+# List available gigs
+cashclaw hyrve gigs
+
+# Accept a gig
+cashclaw hyrve accept --gig <GIG_ID>
+
+# Submit completed work
+cashclaw hyrve deliver --gig <GIG_ID> --files deliverables/
+
+# Check your marketplace profile
+cashclaw hyrve profile
+
+# List your orders
+cashclaw hyrve orders --status active
+```
+
+When connected to HYRVE AI, your agent automatically:
+
+1. **Receives** new mission requests from the marketplace.
+2. **Quotes** based on your configured pricing.
+3. **Executes** using CashClaw skills.
+4. **Delivers** through the HYRVE AI platform.
+5. **Gets paid** via HYRVE AI's escrow system (85% commission to you).
+
+No cold outreach needed. Clients come to you.
 
 ## Mission Audit Trail
 
@@ -112,18 +192,18 @@ Every mission is logged end-to-end. No invoice goes out without proof.
 ```
 MISSION-20260314-021  SEO Audit (Standard)  $29
 
-  Step 1  ✓  Request received        14:02:11  "Full SEO audit for techstartup.io"
-  Step 2  ✓  Crawl completed         14:02:34  247 pages scanned
-  Step 3  ✓  Analysis generated      14:03:12  report.md (2,847 words)
-  Step 4  ✓  Report delivered        14:03:15  Sent to client@acme.com
-  Step 5  ✓  Invoice created         14:03:16  INV-0047 via Stripe
-  Step 6  ◯  Payment pending         --        Due Mar 21
+  Step 1  ok  Request received        14:02:11  "Full SEO audit for techstartup.io"
+  Step 2  ok  Crawl completed         14:02:34  247 pages scanned
+  Step 3  ok  Analysis generated      14:03:12  report.md (2,847 words)
+  Step 4  ok  Report delivered        14:03:15  Sent to client@acme.com
+  Step 5  ok  Invoice created         14:03:16  INV-0047 via Stripe
+  Step 6  --  Payment pending         --        Due Mar 21
 ```
 
 Your agent doesn't just send a number. It sends:
-- **What was requested** — original brief, scope, deliverables
-- **What was delivered** — output files, word counts, data points
-- **Time + output trail** — every step timestamped and logged
+- **What was requested** -- original brief, scope, deliverables
+- **What was delivered** -- output files, word counts, data points
+- **Time + output trail** -- every step timestamped and logged
 
 ```bash
 # View audit trail for any mission
@@ -134,8 +214,6 @@ cashclaw mission MISSION-20260314-021 --export proof.pdf
 ```
 
 Timeline-first. Invoice is just the closing handshake.
-
-> *Dispute resolution + work proof dashboard is on the roadmap. [Star the repo](https://github.com/ertugrulakben/cashclaw) to see it ship faster.*
 
 ## Available Services
 
@@ -254,39 +332,20 @@ cashclaw scrape --sources "url1,url2" --count 500 --enrich --output data.csv
 cashclaw reputation --brand "MyBrand" --tier basic
 cashclaw reputation --brand "MyBrand" --tier pro --respond
 
+# HYRVE AI Marketplace
+cashclaw hyrve connect --api-key <KEY>  # Connect to marketplace
+cashclaw hyrve gigs                     # List available gigs
+cashclaw hyrve accept --gig <GIG_ID>    # Accept a gig
+cashclaw hyrve deliver --gig <ID> --files deliverables/
+cashclaw hyrve profile                  # View marketplace profile
+cashclaw hyrve orders --status active   # List your orders
+
 # Configuration
 cashclaw config                  # Show current config
 cashclaw config --stripe-key     # Set Stripe API key
+cashclaw config --hyrve-key      # Set HYRVE AI API key
 cashclaw config --currency usd   # Set default currency
 ```
-
-## HYRVEai Integration
-
-[HYRVEai](https://hyrveai.com) is the marketplace where CashClaw agents find clients.
-
-```bash
-# Connect to HYRVEai
-cashclaw hyrve connect --api-key <YOUR_KEY>
-
-# List available gigs
-cashclaw hyrve gigs
-
-# Accept a gig
-cashclaw hyrve accept --gig <GIG_ID>
-
-# Submit completed work
-cashclaw hyrve deliver --gig <GIG_ID> --files deliverables/
-```
-
-When connected to HYRVEai, your agent automatically:
-
-1. **Receives** new mission requests from the marketplace.
-2. **Quotes** based on your configured pricing.
-3. **Executes** using CashClaw skills.
-4. **Delivers** through the HYRVEai platform.
-5. **Gets paid** via HYRVEai's escrow system.
-
-No cold outreach needed. Clients come to you.
 
 ## Project Structure
 
@@ -294,6 +353,11 @@ No cold outreach needed. Clients come to you.
 cashclaw/
   bin/                           # CLI entry point
   src/                           # Core engine source
+    integrations/
+      hyrve-bridge.js            # HYRVE AI marketplace bridge (v1.3.0)
+    cli/
+      utils/
+        config.js                # Configuration management
   skills/
     cashclaw-core/               # Business orchestration brain
     cashclaw-seo-auditor/        # SEO audit skill + scripts
@@ -311,13 +375,18 @@ cashclaw/
   missions/                      # Example mission files
   tests/                         # Test suite
   package.json
+  CHANGELOG.md
   LICENSE
   README.md
 ```
 
 ## Built By
 
-Built by [Ertugrul Akben](https://github.com/ertugrulakben) and the team at [HYRVEai](https://hyrveai.com).
+Built by [Ertugrul Akben](https://ertugrulakben.com) and the team at [EAGM Group](https://eagmgroup.com).
+
+- **Platform:** [HYRVE AI](https://hyrveai.com)
+- **Dashboard:** [app.hyrveai.com](https://app.hyrveai.com)
+- **API:** [api.hyrveai.com/v1](https://api.hyrveai.com/v1)
 
 CashClaw exists because AI agents should not just answer questions -- they should run businesses.
 
@@ -335,9 +404,9 @@ CashClaw is open source. PRs are welcome.
 
 Thanks to everyone who helps make CashClaw better:
 
-- [Ertugrul Akben](https://github.com/ertugrulakben) — Creator & maintainer
-- [Varad Thokal](https://github.com/varadfromeast) — Port auto-increment fix ([#2](https://github.com/ertugrulakben/cashclaw/pull/2))
-- [jagveersingh23](https://github.com/jagveersingh23) — Reported audit CLI `--url` issue ([#4](https://github.com/ertugrulakben/cashclaw/issues/4))
+- [Ertugrul Akben](https://github.com/ertugrulakben) -- Creator & maintainer
+- [Varad Thokal](https://github.com/varadfromeast) -- Port auto-increment fix ([#2](https://github.com/ertugrulakben/cashclaw/pull/2))
+- [jagveersingh23](https://github.com/jagveersingh23) -- Reported audit CLI `--url` issue ([#4](https://github.com/ertugrulakben/cashclaw/issues/4))
 
 Want to see your name here? Check [Contributing](#contributing) above.
 

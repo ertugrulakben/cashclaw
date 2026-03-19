@@ -139,9 +139,12 @@ export function getDefaultConfig() {
       },
     },
     hyrve: {
+      api_key: null,
+      agent_id: null,
+      dashboard_url: 'https://app.hyrveai.com',
       api_url: 'https://api.hyrveai.com/v1',
+      enabled: false,
       registered: false,
-      agent_id: '',
     },
     openclaw: {
       workspace: '',
