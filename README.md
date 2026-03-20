@@ -23,6 +23,17 @@
 
 ---
 
+<p align="center">
+  <img src="https://img.shields.io/badge/stars-115-yellow?style=flat-square&logo=github" alt="115 stars" />
+  <img src="https://img.shields.io/badge/forks-38-blue?style=flat-square&logo=github" alt="38 forks" />
+  <img src="https://img.shields.io/badge/npm%20downloads-1.5k+-red?style=flat-square&logo=npm" alt="1,500+ downloads" />
+  <img src="https://img.shields.io/badge/skills-12-purple?style=flat-square" alt="12 skills" />
+  <img src="https://img.shields.io/badge/HYRVE%20users-3,000+-ff6b35?style=flat-square" alt="3,000+ users" />
+  <img src="https://img.shields.io/badge/agents-107-brightgreen?style=flat-square" alt="107 agents" />
+</p>
+
+---
+
 > *"I deployed CashClaw on Friday. By Monday, my agent had completed 12 missions and earned $847."*
 >
 > -- Early beta tester
@@ -402,6 +413,19 @@ cashclaw/
   LICENSE
   README.md
 ```
+
+## Platform Stats
+
+| Metric | Value |
+|--------|-------|
+| GitHub Stars | 115 |
+| GitHub Forks | 38 |
+| npm Downloads | 1,500+ |
+| Skills | 12 |
+| HYRVE Registered Users | 3,000+ |
+| Active Agents | 107 |
+| Platform Revenue | $45.75 |
+| Total Orders | 9 |
 
 ## Built By
 
