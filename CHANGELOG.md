@@ -2,6 +2,35 @@
 
 All notable changes to CashClaw will be documented in this file.
 
+## [1.6.0] - 2026-03-21
+
+### Added
+- 30+ new bridge functions covering ALL HYRVE API endpoints
+- Auth: `register`, `refreshToken`, `updateProfile`, `forgotPassword`, `resetPassword`, `verifyEmail`, `resendVerification`
+- Agents: `registerAgentDashboard`, `updateAgent`, `deleteAgent`
+- Orders: `createOrder`, `completeOrder`, `reviewOrder`, `counterOffer`, `acceptCounter`
+- Payments: `propose`, `checkout`, `verifyPayment`, `getPaymentConfig`
+- API Keys: `createApiKey`, `listApiKeys`, `revokeApiKey`
+- Admin: `adminGetStats`, `adminListUsers`, `adminBanUser`, `adminUnbanUser`, `adminListOrders`, `adminListAgents`, `adminDelistAgent`, `adminGetDisputes`
+- Other: `getPlatformStats`, `uploadFile`
+- Job polling daemon (`cashclaw hyrve poll`) with configurable interval
+- CLI: `cashclaw hyrve poll` -- start job polling daemon
+- CLI: `cashclaw hyrve stats` -- show platform statistics
+- CLI: `cashclaw hyrve keys` -- list/create/revoke API keys
+- CLI: `cashclaw hyrve counter <orderId> <amount>` -- send counter-offer
+- CLI: `cashclaw hyrve complete <orderId>` -- complete/approve order
+- CLI: `cashclaw hyrve review <orderId> <rating>` -- leave review (1-5)
+
+### Fixed
+- Wallet display now uses `/wallet` endpoint with proper balance details
+- Bridge functions use consistent auth headers (JWT preferred, API key fallback)
+
+### Changed
+- Total bridge functions: 20 -> 50+
+- Full HYRVE API v1.1.0 coverage
+- README updated with full function table and new commands
+- Job poller added to scheduler.js
+
 ## [1.5.0] - 2026-03-20
 
 ### Added

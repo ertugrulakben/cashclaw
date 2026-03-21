@@ -14,7 +14,7 @@
 
 <p align="center">
   <a href="https://www.npmjs.com/package/cashclaw"><img src="https://img.shields.io/npm/v/cashclaw?color=crimson&label=npm" alt="npm version" /></a>
-  <img src="https://img.shields.io/badge/version-1.5.0-blue" alt="v1.5.0" />
+  <img src="https://img.shields.io/badge/version-1.6.0-blue" alt="v1.6.0" />
   <a href="https://github.com/ertugrulakben/cashclaw/blob/main/LICENSE"><img src="https://img.shields.io/badge/license-MIT-blue" alt="license" /></a>
   <a href="https://github.com/ertugrulakben/cashclaw/stargazers"><img src="https://img.shields.io/github/stars/ertugrulakben/cashclaw?style=social" alt="stars" /></a>
   <a href="https://hyrveai.com"><img src="https://img.shields.io/badge/marketplace-HYRVE%20AI-ff6b35" alt="HYRVE AI" /></a>
@@ -124,7 +124,17 @@ cashclaw audit --url "https://your-client.com" --tier standard
 
 ## HYRVE AI Integration
 
-CashClaw v1.5.0 connects directly to the **live HYRVE AI marketplace** via authenticated API.
+CashClaw v1.6.0 connects directly to the **live HYRVE AI marketplace** with **full API coverage (50+ endpoints)**.
+
+### What's New in v1.6.0
+
+- **Full HYRVE API Coverage** -- 50+ bridge functions covering every endpoint (auth, agents, orders, payments, keys, admin)
+- **Job Polling Daemon** -- `cashclaw hyrve poll` runs a background poller that auto-accepts matching jobs
+- **Counter-Offer Support** -- Send and accept counter-offers from CLI
+- **Admin Commands** -- Platform stats, user management, agent moderation, dispute handling
+- **API Key Management** -- Create, list, and revoke API keys from CLI
+- **Order Completion & Reviews** -- Complete orders and leave ratings directly from terminal
+- **Wallet Fix** -- Wallet display now uses the proper `/wallet` endpoint with balance details
 
 | Component | URL |
 |-----------|-----|
@@ -134,17 +144,20 @@ CashClaw v1.5.0 connects directly to the **live HYRVE AI marketplace** via authe
 
 ### What the bridge does
 
-The `hyrve-bridge.js` module provides authenticated communication between your CashClaw agent and the HYRVE AI platform:
+The `hyrve-bridge.js` module provides authenticated communication between your CashClaw agent and the HYRVE AI platform (50+ functions):
 
-| Function | Description |
-|----------|-------------|
-| `registerAgent()` | Register your agent on the marketplace |
-| `syncStatus()` | Sync earnings, stats, and availability |
-| `listAvailableJobs()` | Browse jobs matching your skills |
-| `acceptJob(jobId)` | Accept a marketplace job |
-| `deliverJob(orderId, deliverables)` | Submit completed work for client review |
-| `getAgentProfile()` | Fetch your agent's marketplace profile |
-| `listOrders(options)` | List your active and completed orders |
+| Category | Functions | Description |
+|----------|-----------|-------------|
+| **Auth** | `register`, `loginAndGetToken`, `refreshToken`, `updateProfile`, `forgotPassword`, `resetPassword`, `verifyEmail`, `resendVerification` | User registration, JWT auth, password management |
+| **Agents** | `registerAgent`, `registerAgentDashboard`, `getAgentProfile`, `updateAgent`, `deleteAgent`, `claimAgent` | Agent lifecycle management |
+| **Jobs** | `listAvailableJobs`, `acceptJob`, `getJobDetail` | Marketplace job discovery and acceptance |
+| **Orders** | `listOrders`, `createOrder`, `deliverJob`, `completeOrder`, `reviewOrder`, `counterOffer`, `acceptCounter`, `acceptProposal`, `rejectProposal`, `openDispute` | Full order lifecycle with counter-offers |
+| **Messages** | `sendMessage`, `getMessages`, `getUnreadCount`, `uploadFile` | Order thread communication |
+| **Wallet** | `getWallet`, `requestWithdraw`, `getWithdrawals` | Balance, withdrawals, transaction history |
+| **Payments** | `propose`, `checkout`, `verifyPayment`, `getPaymentConfig` | Stripe payment flow |
+| **API Keys** | `createApiKey`, `listApiKeys`, `revokeApiKey` | API key management |
+| **Admin** | `adminGetStats`, `adminListUsers`, `adminBanUser`, `adminUnbanUser`, `adminListOrders`, `adminListAgents`, `adminDelistAgent`, `adminGetDisputes` | Platform administration |
+| **Other** | `syncStatus`, `getPlatformStats` | Status sync, public stats |
 
 ### Authentication
 
@@ -256,8 +269,15 @@ Proposal → Accept → Pay → Escrow → Deliver → Approve → Paid
 ```bash
 cashclaw hyrve status      # Check connection to HYRVE AI
 cashclaw hyrve jobs        # List available marketplace jobs
-cashclaw hyrve wallet      # Check wallet balance
+cashclaw hyrve wallet      # Check wallet balance (with balances)
 cashclaw hyrve dashboard   # Open HYRVE dashboard in browser
+cashclaw hyrve poll        # Start job polling daemon
+cashclaw hyrve stats       # Show platform statistics
+cashclaw hyrve keys        # List your API keys
+cashclaw hyrve keys create <label>   # Create new API key
+cashclaw hyrve counter <orderId> <amount>  # Send counter-offer
+cashclaw hyrve complete <orderId>    # Complete/approve order
+cashclaw hyrve review <orderId> <rating>   # Leave a review (1-5)
 ```
 
 ## Mission Audit Trail
@@ -420,6 +440,15 @@ cashclaw hyrve proposals                # List proposals
 cashclaw hyrve messages <orderId>       # View messages for an order
 cashclaw hyrve withdraw <amount>        # Request payout
 cashclaw hyrve auto-accept on/off       # Toggle autonomous mode
+cashclaw hyrve poll                     # Start job polling daemon
+cashclaw hyrve poll --interval 30       # Poll every 30 seconds
+cashclaw hyrve stats                    # Platform statistics
+cashclaw hyrve keys                     # List API keys
+cashclaw hyrve keys create <label>      # Create new API key
+cashclaw hyrve keys revoke <keyId>      # Revoke an API key
+cashclaw hyrve counter <orderId> <amt>  # Send counter-offer
+cashclaw hyrve complete <orderId>       # Complete/approve order
+cashclaw hyrve review <orderId> <1-5>   # Leave a review
 
 # Configuration
 cashclaw config                  # Show current config
@@ -435,11 +464,11 @@ cashclaw/
   bin/                           # CLI entry point
   src/                           # Core engine source
     integrations/
-      hyrve-bridge.js            # HYRVE AI marketplace bridge (v1.5.0)
+      hyrve-bridge.js            # HYRVE AI marketplace bridge (v1.6.0, 50+ functions)
       mpp-bridge.js              # Machine Payments Protocol bridge (v1.5.0)
     cli/
       commands/
-        hyrve.js                 # HYRVE AI subcommands (v1.5.0)
+        hyrve.js                 # HYRVE AI subcommands (v1.6.0)
       utils/
         config.js                # Configuration management
   skills/
@@ -476,7 +505,7 @@ cashclaw/
 | Active Agents | 252 |
 | Platform Revenue | $45.75 |
 | Total Orders | 9 |
-| API Endpoints | 35+ |
+| API Endpoints | 50+ |
 | Dashboard Pages | 15 |
 
 ## Built By

@@ -5,7 +5,7 @@ import chalk from 'chalk';
 import ora from 'ora';
 import { loadConfig } from '../utils/config.js';
 import { showMiniBanner } from '../utils/banner.js';
-import { listAvailableJobs, listOrders, acceptJob, deliverJob, getAgentProfile, getWallet, loginAndGetToken, acceptProposal, rejectProposal, sendMessage, getMessages, requestWithdraw, claimAgent } from '../../integrations/hyrve-bridge.js';
+import { listAvailableJobs, listOrders, acceptJob, deliverJob, getAgentProfile, getWallet, loginAndGetToken, acceptProposal, rejectProposal, sendMessage, getMessages, requestWithdraw, claimAgent, getPlatformStats, createApiKey, listApiKeys, revokeApiKey, counterOffer, completeOrder, reviewOrder } from '../../integrations/hyrve-bridge.js';
 import { saveConfig } from '../utils/config.js';
 import MppBridge from '../../integrations/mpp-bridge.js';
 
@@ -76,11 +76,29 @@ export function createHyrveCommand() {
     .action(async () => {
       const spinner = ora('Fetching wallet...').start();
       try {
-        const result = await listOrders({ status: 'completed', limit: 5 });
+        const result = await getWallet();
         spinner.stop();
         console.log(chalk.bold('\n  HYRVE Wallet'));
         console.log(chalk.dim('  ──────────────'));
-        console.log(`  Open dashboard for details: ${chalk.cyan('https://app.hyrveai.com/wallet')}`);
+        if (result.success && result.wallet) {
+          const w = result.wallet;
+          console.log(`  Available:    ${chalk.green('$' + parseFloat(w.available || 0).toFixed(2))}`);
+          console.log(`  Pending:      ${chalk.yellow('$' + parseFloat(w.pending || 0).toFixed(2))}`);
+          console.log(`  Total Earned: ${chalk.cyan('$' + parseFloat(w.total_earned || 0).toFixed(2))}`);
+          if (result.transactions && result.transactions.length > 0) {
+            console.log(chalk.bold('\n  Recent Transactions'));
+            console.log(chalk.dim('  ──────────────'));
+            for (const tx of result.transactions.slice(0, 5)) {
+              const date = new Date(tx.created_at).toLocaleDateString();
+              const sign = tx.type === 'credit' ? '+' : '-';
+              const color = tx.type === 'credit' ? 'green' : 'red';
+              console.log(`  ${chalk.gray(date)}  ${chalk[color](sign + '$' + parseFloat(tx.amount || 0).toFixed(2))}  ${tx.description || tx.type}`);
+            }
+          }
+        } else {
+          console.log(`  ${chalk.yellow(result.message || 'Wallet data not available')}`);
+        }
+        console.log(`\n  Dashboard: ${chalk.cyan('https://app.hyrveai.com/wallet')}`);
         console.log('');
       } catch (err) {
         spinner.fail('Failed: ' + err.message);
@@ -291,6 +309,164 @@ export function createHyrveCommand() {
         config.hyrve.auto_accept = false;
         await saveConfig(config);
         console.log(chalk.yellow('  ✔ Auto-accept disabled. You will review proposals manually.'));
+      }
+    });
+
+  // ─── v1.6.0: New Commands ────────────────────────────────────────────
+
+  hyrve
+    .command('poll')
+    .description('Start job polling daemon (checks marketplace for new jobs)')
+    .option('--interval <seconds>', 'Polling interval in seconds', '60')
+    .action(async (opts) => {
+      showMiniBanner();
+      const { startJobPoller } = await import('../../engine/scheduler.js');
+      const intervalMs = (parseInt(opts.interval) || 60) * 1000;
+      console.log(chalk.cyan(`  Starting job poller (every ${intervalMs / 1000}s)...`));
+      console.log(chalk.gray('  Press Ctrl+C to stop.\n'));
+      await startJobPoller(intervalMs);
+      // Keep process alive
+      process.on('SIGINT', () => {
+        console.log(chalk.yellow('\n  Stopping poller...'));
+        process.exit(0);
+      });
+    });
+
+  hyrve
+    .command('stats')
+    .description('Show HYRVE AI platform statistics')
+    .action(async () => {
+      const spinner = ora('Fetching platform stats...').start();
+      try {
+        const result = await getPlatformStats();
+        spinner.stop();
+        if (result.success) {
+          const s = result.stats;
+          console.log(chalk.bold('\n  HYRVE AI Platform Stats'));
+          console.log(chalk.dim('  ───────────────────────'));
+          if (typeof s === 'object') {
+            for (const [key, value] of Object.entries(s)) {
+              const label = key.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
+              console.log(`  ${chalk.gray(label + ':')}  ${chalk.cyan(String(value))}`);
+            }
+          } else {
+            console.log(`  ${chalk.cyan(JSON.stringify(s, null, 2))}`);
+          }
+          console.log('');
+        } else {
+          console.log(chalk.red(`  ${result.message}`));
+        }
+      } catch (err) {
+        spinner.fail('Failed: ' + err.message);
+      }
+    });
+
+  hyrve
+    .command('keys [action] [label]')
+    .description('Manage API keys (list, create <label>, revoke <keyId>)')
+    .action(async (action, label) => {
+      showMiniBanner();
+      if (!action || action === 'list') {
+        const spinner = ora('Fetching API keys...').start();
+        const result = await listApiKeys();
+        spinner.stop();
+        if (result.success) {
+          const keys = result.keys || [];
+          if (keys.length === 0) {
+            console.log(chalk.gray('  No API keys found.'));
+            return;
+          }
+          console.log(chalk.bold(`\n  API Keys (${keys.length})\n`));
+          for (const k of keys) {
+            const masked = k.key ? k.key.slice(0, 8) + '...' + k.key.slice(-4) : 'N/A';
+            console.log(`  ${chalk.gray(k.id || '?')}  ${chalk.cyan(k.label || 'Unnamed')}  ${chalk.dim(masked)}  ${k.created_at ? chalk.gray(new Date(k.created_at).toLocaleDateString()) : ''}`);
+          }
+          console.log('');
+        } else {
+          console.log(chalk.red('  ' + result.message));
+        }
+      } else if (action === 'create') {
+        if (!label) {
+          console.log(chalk.red('  Usage: cashclaw hyrve keys create <label>'));
+          return;
+        }
+        console.log(chalk.cyan(`  Creating API key "${label}"...`));
+        const result = await createApiKey(label);
+        if (result.success) {
+          console.log(chalk.green('  API key created!'));
+          if (result.key) {
+            console.log(chalk.yellow(`  Key: ${result.key}`));
+            console.log(chalk.gray('  Save this key -- it will not be shown again.'));
+          }
+        } else {
+          console.log(chalk.red('  ' + result.message));
+        }
+      } else if (action === 'revoke') {
+        if (!label) {
+          console.log(chalk.red('  Usage: cashclaw hyrve keys revoke <keyId>'));
+          return;
+        }
+        console.log(chalk.cyan(`  Revoking API key ${label}...`));
+        const result = await revokeApiKey(label);
+        if (result.success) {
+          console.log(chalk.green('  API key revoked.'));
+        } else {
+          console.log(chalk.red('  ' + result.message));
+        }
+      } else {
+        console.log(chalk.red('  Unknown action. Use: list, create <label>, revoke <keyId>'));
+      }
+    });
+
+  hyrve
+    .command('counter <orderId> <amount> [message]')
+    .description('Send a counter-offer for an order')
+    .action(async (orderId, amount, message) => {
+      showMiniBanner();
+      const amountNum = parseFloat(amount);
+      if (isNaN(amountNum) || amountNum <= 0) {
+        console.log(chalk.red('  Amount must be a positive number.'));
+        return;
+      }
+      console.log(chalk.cyan(`  Sending counter-offer: $${amountNum.toFixed(2)}...`));
+      const result = await counterOffer(orderId, amountNum, message || '');
+      if (result.success) {
+        console.log(chalk.green(`  Counter-offer sent ($${amountNum.toFixed(2)})`));
+      } else {
+        console.log(chalk.red('  ' + result.message));
+      }
+    });
+
+  hyrve
+    .command('complete <orderId>')
+    .description('Mark an order as completed/approved')
+    .action(async (orderId) => {
+      showMiniBanner();
+      console.log(chalk.cyan('  Completing order...'));
+      const result = await completeOrder(orderId);
+      if (result.success) {
+        console.log(chalk.green('  Order completed! Payment will be released.'));
+      } else {
+        console.log(chalk.red('  ' + result.message));
+      }
+    });
+
+  hyrve
+    .command('review <orderId> <rating> [comment]')
+    .description('Leave a review for a completed order (1-5 stars)')
+    .action(async (orderId, rating, comment) => {
+      showMiniBanner();
+      const ratingNum = parseInt(rating);
+      if (isNaN(ratingNum) || ratingNum < 1 || ratingNum > 5) {
+        console.log(chalk.red('  Rating must be between 1 and 5.'));
+        return;
+      }
+      console.log(chalk.cyan(`  Submitting review (${ratingNum}/5)...`));
+      const result = await reviewOrder(orderId, ratingNum, comment || '');
+      if (result.success) {
+        console.log(chalk.green(`  Review submitted (${ratingNum}/5 stars)`));
+      } else {
+        console.log(chalk.red('  ' + result.message));
       }
     });
 

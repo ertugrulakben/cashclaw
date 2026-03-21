@@ -137,3 +137,81 @@ export async function checkUnpaidInvoices() {
 export function isHeartbeatRunning() {
   return isRunning;
 }
+
+// ─── v1.6.0: Job Polling Daemon ─────────────────────────────────────────
+
+let jobPollerTimer = null;
+let isPollerRunning = false;
+
+/**
+ * Start the job polling daemon that periodically checks the HYRVE marketplace
+ * for new jobs and optionally auto-accepts them based on config.
+ * @param {number} intervalMs - Polling interval in milliseconds (default: 60000)
+ * @returns {object} The interval timer (can be cleared with clearInterval)
+ */
+export async function startJobPoller(intervalMs = 60000) {
+  if (isPollerRunning) {
+    console.log('[Poller] Job poller already running.');
+    return jobPollerTimer;
+  }
+
+  const { listAvailableJobs, acceptJob, syncStatus } = await import('../integrations/hyrve-bridge.js');
+
+  console.log(`[Poller] Starting job poller (every ${intervalMs / 1000}s)`);
+  isPollerRunning = true;
+
+  async function poll() {
+    try {
+      const config = await loadConfig();
+
+      // Send heartbeat to HYRVE
+      await syncStatus().catch(() => {});
+
+      // Check for new jobs
+      const result = await listAvailableJobs();
+      const jobs = result?.jobs || [];
+
+      if (jobs.length > 0) {
+        console.log(`[Poller] Found ${jobs.length} available job(s)`);
+      }
+
+      if (jobs.length > 0 && config.hyrve?.auto_accept) {
+        const maxUsd = config.hyrve?.auto_accept_max_usd || config.hyrve?.max_accept_usd || 100;
+        for (const job of jobs) {
+          const budget = parseFloat(job.budget_usd || 0);
+          if (budget <= maxUsd && budget > 0) {
+            console.log(`[Poller] Auto-accepting job: ${job.title} ($${budget})`);
+            await acceptJob(job.id).catch(e => console.error(`[Poller] Accept failed: ${e.message}`));
+          }
+        }
+      }
+    } catch (err) {
+      console.error(`[Poller] Error: ${err.message}`);
+    }
+  }
+
+  // Initial poll
+  await poll();
+  // Repeat
+  jobPollerTimer = setInterval(poll, intervalMs);
+  return jobPollerTimer;
+}
+
+/**
+ * Stop the job polling daemon.
+ */
+export function stopJobPoller() {
+  if (jobPollerTimer) {
+    clearInterval(jobPollerTimer);
+    jobPollerTimer = null;
+  }
+  isPollerRunning = false;
+  console.log('[Poller] Job poller stopped.');
+}
+
+/**
+ * Check if the job poller is currently running.
+ */
+export function isPollerActive() {
+  return isPollerRunning;
+}

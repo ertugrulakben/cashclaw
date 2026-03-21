@@ -1,6 +1,6 @@
 {
   "name": "cashclaw",
-  "version": "1.5.0",
+  "version": "1.6.0",
   "description": "Turn your OpenClaw AI agent into a money-making machine — 12 skills, audit trails, security hardened",
   "type": "module",
   "bin": {
