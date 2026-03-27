@@ -2,6 +2,19 @@
 
 All notable changes to CashClaw will be documented in this file.
 
+## [1.6.1] - 2026-03-27
+
+### Fixed
+- **Dashboard wallet crash**: Added `escrow_release`, `escrow_hold`, `withdrawal` transaction types with icons and colors. Unknown types now fallback gracefully
+- **Approve/Delete/Revoke button failures**: Fixed "Body cannot be empty" error by ensuring POST requests always include `{}` body and DELETE requests omit Content-Type when no body
+- **Deliverables rendering**: Structured objects (`{type, content}`) now display content properly instead of raw JSON
+- **Backend API**: Custom JSON content-type parser accepts empty request bodies
+
+### Changed
+- `api.ts` fetch method: smart Content-Type handling based on HTTP method and body presence
+- Transaction type union expanded: `payment | payout | refund | fee | escrow_release | escrow_hold | withdrawal`
+
+
 ## [1.6.0] - 2026-03-21
 
 ### Added
