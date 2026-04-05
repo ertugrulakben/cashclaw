@@ -5,7 +5,7 @@ import chalk from 'chalk';
 import ora from 'ora';
 import { loadConfig } from '../utils/config.js';
 import { showMiniBanner } from '../utils/banner.js';
-import { listAvailableJobs, listOrders, acceptJob, deliverJob, getAgentProfile, getWallet, loginAndGetToken, acceptProposal, rejectProposal, sendMessage, getMessages, requestWithdraw, claimAgent, getPlatformStats, createApiKey, listApiKeys, revokeApiKey, counterOffer, completeOrder, reviewOrder } from '../../integrations/hyrve-bridge.js';
+import { listAvailableJobs, listOrders, acceptJob, deliverJob, getAgentProfile, getWallet, loginAndGetToken, acceptProposal, rejectProposal, sendMessage, getMessages, requestWithdraw, claimAgent, getPlatformStats, createApiKey, listApiKeys, revokeApiKey, counterOffer, completeOrder, reviewOrder, getMyAgents } from '../../integrations/hyrve-bridge.js';
 import { saveConfig } from '../utils/config.js';
 import MppBridge from '../../integrations/mpp-bridge.js';
 
@@ -212,6 +212,28 @@ export function createHyrveCommand() {
         config.hyrve.refresh_token = result.refresh_token;
         await saveConfig(config);
         console.log(chalk.green('  ✔ Logged in! Token saved.'));
+
+        // Fetch agent profile to populate agent_id if missing
+        if (!config.hyrve.agent_id) {
+          const spinner = ora('  Fetching agent profile...').start();
+          try {
+            const agentsResult = await getMyAgents();
+            if (agentsResult.success && agentsResult.agents && agentsResult.agents.length > 0) {
+              const agent = agentsResult.agents[0];
+              config.hyrve.agent_id = agent.id;
+              config.hyrve.registered = true;
+              if (agent.api_key && !config.hyrve.api_key) {
+                config.hyrve.api_key = agent.api_key;
+              }
+              await saveConfig(config);
+              spinner.succeed(`  Agent linked: ${agent.name || agent.id}`);
+            } else {
+              spinner.info('  No agents found on your account. Register one with "cashclaw init".');
+            }
+          } catch {
+            spinner.info('  Could not fetch agent profile. Run "cashclaw hyrve profile" later.');
+          }
+        }
       } else {
         console.log(chalk.red('  ✖ ' + result.message));
       }
@@ -225,7 +247,20 @@ export function createHyrveCommand() {
       console.log(chalk.cyan('  Claiming agent...'));
       const result = await claimAgent(apiKey);
       if (result.success) {
+        const config = await loadConfig();
+        config.hyrve = config.hyrve || {};
+        if (result.agent) {
+          config.hyrve.agent_id = result.agent.id || result.agent.agent_id;
+          config.hyrve.registered = true;
+          if (!config.hyrve.api_key && apiKey) {
+            config.hyrve.api_key = apiKey;
+          }
+          await saveConfig(config);
+        }
         console.log(chalk.green('  ✔ Agent claimed! ' + (result.message || '')));
+        if (config.hyrve.agent_id) {
+          console.log(chalk.gray(`    Agent ID: ${config.hyrve.agent_id}`));
+        }
       } else {
         console.log(chalk.red('  ✖ ' + result.message));
       }

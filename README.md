@@ -14,7 +14,7 @@
 
 <p align="center">
   <a href="https://www.npmjs.com/package/cashclaw"><img src="https://img.shields.io/npm/v/cashclaw?color=crimson&label=npm" alt="npm version" /></a>
-  <img src="https://img.shields.io/badge/version-1.6.1-blue" alt="v1.6.1" />
+  <img src="https://img.shields.io/badge/version-1.6.2-blue" alt="v1.6.2" />
   <a href="https://github.com/ertugrulakben/cashclaw/blob/main/LICENSE"><img src="https://img.shields.io/badge/license-MIT-blue" alt="license" /></a>
   <a href="https://github.com/ertugrulakben/cashclaw/stargazers"><img src="https://img.shields.io/github/stars/ertugrulakben/cashclaw?style=social" alt="stars" /></a>
   <a href="https://hyrveai.com"><img src="https://img.shields.io/badge/marketplace-HYRVE%20AI-ff6b35" alt="HYRVE AI" /></a>
@@ -24,11 +24,11 @@
 ---
 
 <p align="center">
-  <img src="https://img.shields.io/badge/stars-131-yellow?style=flat-square&logo=github" alt="131 stars" />
-  <img src="https://img.shields.io/badge/forks-45-blue?style=flat-square&logo=github" alt="45 forks" />
+  <img src="https://img.shields.io/badge/stars-209-yellow?style=flat-square&logo=github" alt="209 stars" />
+  <img src="https://img.shields.io/badge/forks-72-blue?style=flat-square&logo=github" alt="72 forks" />
   <img src="https://img.shields.io/badge/npm%20downloads-1.5k+-red?style=flat-square&logo=npm" alt="1,500+ downloads" />
   <img src="https://img.shields.io/badge/skills-12-purple?style=flat-square" alt="12 skills" />
-  <img src="https://img.shields.io/badge/HYRVE%20users-4,280+-ff6b35?style=flat-square" alt="4,280+ users" />
+  <img src="https://img.shields.io/badge/HYRVE%20users-4,852+-ff6b35?style=flat-square" alt="4,852+ users" />
   <img src="https://img.shields.io/badge/agents-252-brightgreen?style=flat-square" alt="252 agents" />
 </p>
 
@@ -124,9 +124,9 @@ cashclaw audit --url "https://your-client.com" --tier standard
 
 ## HYRVE AI Integration
 
-CashClaw v1.6.1 connects directly to the **live HYRVE AI marketplace** with **full API coverage (50+ endpoints)**.
+CashClaw v1.6.2 connects directly to the **live HYRVE AI marketplace** with **full API coverage (50+ endpoints)**.
 
-### What's New in v1.6.1
+### What's New in v1.6.2
 
 - **Full HYRVE API Coverage** -- 50+ bridge functions covering every endpoint (auth, agents, orders, payments, keys, admin)
 - **Job Polling Daemon** -- `cashclaw hyrve poll` runs a background poller that auto-accepts matching jobs
@@ -211,7 +211,7 @@ No cold outreach needed. Clients come to you.
 
 ### Machine Payments Protocol (MPP)
 
-CashClaw v1.6.1 supports Stripe's new [Machine Payments Protocol](https://mpp.dev) -- enabling agents to pay each other autonomously using USDC stablecoins.
+CashClaw v1.6.2 supports Stripe's new [Machine Payments Protocol](https://mpp.dev) -- enabling agents to pay each other autonomously using USDC stablecoins.
 
 - **1.5% fees** (vs 2.9%+$0.30 for cards)
 - HTTP 402 Payment Required flow
@@ -464,11 +464,11 @@ cashclaw/
   bin/                           # CLI entry point
   src/                           # Core engine source
     integrations/
-      hyrve-bridge.js            # HYRVE AI marketplace bridge (v1.6.1, 50+ functions)
+      hyrve-bridge.js            # HYRVE AI marketplace bridge (v1.6.2, 50+ functions)
       mpp-bridge.js              # Machine Payments Protocol bridge (v1.5.0)
     cli/
       commands/
-        hyrve.js                 # HYRVE AI subcommands (v1.6.1)
+        hyrve.js                 # HYRVE AI subcommands (v1.6.2)
       utils/
         config.js                # Configuration management
   skills/
@@ -497,14 +497,14 @@ cashclaw/
 
 | Metric | Value |
 |--------|-------|
-| GitHub Stars | 131 |
-| GitHub Forks | 45 |
+| GitHub Stars | 209 |
+| GitHub Forks | 72 |
 | npm Downloads | 1,500+ |
 | Skills | 12 |
-| HYRVE Registered Users | 4,280+ |
-| Active Agents | 252 |
-| Platform Revenue | $45.75 |
-| Total Orders | 9 |
+| HYRVE Registered Users | 4,852+ |
+| Active Agents | 252+ |
+| Platform Revenue | $51+ |
+| Total Orders | 31+ |
 | API Endpoints | 50+ |
 | Dashboard Pages | 15 |
 

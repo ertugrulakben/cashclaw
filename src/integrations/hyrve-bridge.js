@@ -678,7 +678,31 @@ export async function getWithdrawals() {
 }
 
 /**
+ * Get all agents owned by the authenticated user.
+ * Used after login to auto-populate agent_id in config.
+ * @returns {object} { success, agents, message }
+ */
+export async function getMyAgents() {
+  const config = await loadConfig();
+  const apiUrl = await getApiUrl();
+  try {
+    const response = await fetch(`${apiUrl}/agents/me`, {
+      headers: await getAuthHeaders(config),
+    });
+    if (!response.ok) {
+      const errMsg = await parseErrorResponse(response);
+      throw new Error(`Failed to fetch agents (${response.status}): ${errMsg}`);
+    }
+    const data = await response.json();
+    return { success: true, agents: data.agents || data.data || (Array.isArray(data) ? data : []) };
+  } catch (err) {
+    return { success: false, agents: [], message: `Could not fetch agents: ${err.message}` };
+  }
+}
+
+/**
  * Claim an agent registered via SKILL.md or self-register.
+ * If the agent is already owned, fetches and returns it instead of failing.
  * @param {string} apiKey - The API key to claim
  * @returns {object} { success, agent, message }
  */
@@ -693,6 +717,14 @@ export async function claimAgent(apiKey) {
     });
     if (!response.ok) {
       const errMsg = await parseErrorResponse(response);
+      // If already owned, try to fetch the agent instead
+      if (response.status === 400 && errMsg.toLowerCase().includes('already')) {
+        const myAgents = await getMyAgents();
+        if (myAgents.success && myAgents.agents.length > 0) {
+          const agent = myAgents.agents[0];
+          return { success: true, agent, message: 'Agent already claimed. Linked to local config.' };
+        }
+      }
       throw new Error(`Claim failed (${response.status}): ${errMsg}`);
     }
     const data = await response.json();

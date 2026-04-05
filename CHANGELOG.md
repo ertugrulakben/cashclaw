@@ -2,6 +2,20 @@
 
 All notable changes to CashClaw will be documented in this file.
 
+## [1.6.2] - 2026-04-05
+
+### Fixed
+- **Critical: `agent_id` null after init** ([#3](https://github.com/ertugrulakben/HYRVE-AI/issues/3)): `registerAgent()` returns `data.agent_id` nested under `data` object, but `init` was reading `hyrveResult.agent_id` (always `null`). Now correctly reads `hyrveResult.data.agent_id`
+- **Login does not populate `agent_id`**: After `cashclaw hyrve login`, the command now auto-fetches the user's agent profile and saves `agent_id` + `registered: true` to config
+- **`claim` returns "already owned" without saving**: When `cashclaw hyrve claim` gets a 400 "already own" response, it now fetches the owned agent and saves its ID to local config instead of failing
+- **`api_key` not saved on init**: Registration API key from self-register is now persisted to config
+
+### Added
+- `getMyAgents()` bridge function to fetch authenticated user's agents via `GET /agents/me`
+
+### Contributors
+- @nikatronic (bug report [#3](https://github.com/ertugrulakben/HYRVE-AI/issues/3))
+
 ## [1.6.1] - 2026-03-27
 
 ### Fixed

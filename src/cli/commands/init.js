@@ -232,11 +232,14 @@ export async function runInit() {
   // ─── Try HYRVE Registration ──────────────────────────────────────────
   const hyrveSpinner = ora('Registering with HYRVEai marketplace...').start();
   const hyrveResult = await registerAgent(config);
-  if (hyrveResult.success) {
+  if (hyrveResult.success && hyrveResult.data) {
     config.hyrve.registered = true;
-    config.hyrve.agent_id = hyrveResult.agent_id;
+    config.hyrve.agent_id = hyrveResult.data.agent_id;
+    if (hyrveResult.data.api_key) {
+      config.hyrve.api_key = hyrveResult.data.api_key;
+    }
     await saveConfig(config);
-    hyrveSpinner.succeed('Registered with HYRVEai');
+    hyrveSpinner.succeed(`Registered with HYRVEai (Agent ID: ${config.hyrve.agent_id})`);
   } else {
     hyrveSpinner.info(hyrveResult.message);
   }
