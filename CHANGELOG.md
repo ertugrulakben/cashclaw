@@ -2,6 +2,65 @@
 
 All notable changes to CashClaw will be documented in this file.
 
+## [1.7.0] - 2026-05-19
+
+### Added — CashClaw Guard (13th skill, eksiksiz sürüm)
+
+**Runtime protection layer that ships with the SDK.** Three enforcement primitives in one binary:
+
+- **Hard cost cap** — per-call USD limit + daily USD limit per scope. Real-time pricing tablosu OpenAI (gpt-5.5, gpt-5, gpt-4o), Anthropic (claude-opus-4-7, claude-sonnet-4-6), Google (gemini-3.1-pro), Moonshot (kimi-k2.6). Throws `BudgetExceeded`.
+- **Recursive call detection** — SHA-1 fingerprint over `model + prompt + label`. Counts repeats inside a sliding window. Throws `RecursionKilled` before the loop bankrupts you.
+- **Tool firewall** — allowlist + denylist + per-tool rate limits (max_per_minute, max_per_hour). Throws `ToolDenied` / `RateLimitExceeded`.
+
+**SDK**:
+```js
+import { guard } from 'cashclaw/guard';
+const safe = guard.llm({ maxCostUsd: 5, agentId: 'support-bot' })(myLlmCall);
+guard.tool('shell', { agentId: 'support-bot' }); // throws ToolDenied
+```
+
+**CLI**:
+- `cashclaw guard init` — write `~/.cashclaw/guard-policy.yaml` from template
+- `cashclaw guard status` — show active policy + last 10 Guard events
+- `cashclaw guard test` — dry-run 8 enforcement scenarios
+- `cashclaw guard kill <agentId>` — write a kill flag for a running agent
+- `cashclaw guard logs` — print in-process event ring buffer
+- `cashclaw guard reload` — hot-reload YAML policy without restart
+
+**YAML policy** — first-class declarative config with built-in defaults. Hot reload supported.
+
+**Webhook alerts** — Telegram, Slack, Discord, generic POST. Per-channel event subscription (`on: [budget_exceeded, recursion_killed, ...]`).
+
+**New module layout**:
+- `src/guard/index.js` — public SDK
+- `src/guard/policy.js` — YAML parser with `Policy.fromFile` / `Policy.fromYaml`
+- `src/guard/decorator.js` — `guard.llm()`, `guard.tool()`, `guard.wrap()`
+- `src/guard/cost-tracker.js` — token + USD aggregation
+- `src/guard/recursion-detector.js` — fingerprint + window counter
+- `src/guard/tool-firewall.js` — allowlist + denylist + rate limit
+- `src/guard/webhook.js` — multi-channel dispatcher
+- `src/guard/exceptions.js` — `GuardError`, `BudgetExceeded`, `RecursionKilled`, `ToolDenied`, `RateLimitExceeded`, `TokenLimitExceeded`
+- `src/cli/commands/guard.js` — CLI surface
+- `templates/guard-policy.yaml` — default policy
+- `tests/guard.test.js` — 8 unit tests
+- `skills/cashclaw-guard/SKILL.md` + `scripts/guard.js` — OpenClaw skill
+
+### Changed
+- Skill count **12 → 13**
+- Package description rewritten: *"The Agent Economy Layer — agents earn, agents spend, Guard protects."*
+- HYRVE bridge User-Agent stamp `CashClaw/1.6.2` → `CashClaw/1.7.0`
+- README repositioned as **Agent Economy Layer** (earn + spend + protect)
+- Platform stats refreshed: 271 stars, 103 forks, 13 watchers, 5,750+ community
+- New keywords: `agent-guard`, `cost-cap`, `runtime-governance`, `agent-economy`
+
+### Dependencies
+- Added `js-yaml ^4.1.0` for policy parsing
+
+### Why Guard, why now?
+Cloudflare lost **$34,000 in 8 days** to a Durable Object loop calling an LLM API on every tick (February 2026). OpenAI / Anthropic soft limits kick in 24 hours after breach — too late. Helicone / Langfuse / Datadog observe, they do not enforce. Guard is the missing runtime layer that **stops the bleeding** at call zero.
+
+This is the first OSS release that combines monetization (Earn) and protection (Guard) in a single SDK. Big Tech has incentive to ship one but not the other; CashClaw ships both because the agent economy needs both halves to function.
+
 ## [1.6.2] - 2026-04-05
 
 ### Fixed

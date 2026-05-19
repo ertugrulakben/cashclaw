@@ -10,6 +10,7 @@ import { listMissions, createMission, startMission, completeMission, cancelMissi
 import { getTotal, getMonthly, getWeekly, getToday, getHistory, getByService } from '../engine/earnings-tracker.js';
 import { listInstalledSkills, listAvailableSkills, installSkills } from '../integrations/openclaw-bridge.js';
 import { createHyrveCommand } from './commands/hyrve.js';
+import { createGuardCommand } from './commands/guard.js';
 import Table from 'cli-table3';
 import fs from 'fs-extra';
 import path from 'path';
@@ -567,6 +568,9 @@ program
 
 // ─── cashclaw hyrve ───────────────────────────────────────────────────
 program.addCommand(createHyrveCommand());
+
+// ─── cashclaw guard ───────────────────────────────────────────────────
+program.addCommand(createGuardCommand());
 
 // ─── Default action (no command) ───────────────────────────────────────
 program.action(() => {

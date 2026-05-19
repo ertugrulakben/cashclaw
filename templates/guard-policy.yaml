@@ -1,0 +1,92 @@
+# CashClaw Guard - Runtime Protection Policy
+# v1.7.0
+#
+# Drop this file into ~/.cashclaw/guard-policy.yaml or pass via
+# `cashclaw guard init --policy ./custom.yaml`.
+#
+# The Guard runtime reloads this file on `cashclaw guard reload`
+# or when the SDK calls Policy.fromFile() again.
+
+version: 1
+
+# ----------------------------------------------------------------------
+# Hard limits — all caps are HARD by default (throw on breach).
+# Set `enforce: false` on any limit to log-only.
+# ----------------------------------------------------------------------
+limits:
+  # Daily budget per scope (per-agent / per-workflow / global).
+  cost_usd_per_day: 50
+
+  # Maximum spend on a single LLM call.
+  cost_usd_per_call: 5
+
+  # Maximum tokens (input + output) per call.
+  max_tokens_per_call: 50000
+
+  # Maximum call-stack depth for nested agent invocations.
+  max_recursion_depth: 10
+
+# ----------------------------------------------------------------------
+# Recursion detector — kills runaway agents that keep calling the same
+# signature with the same prompt.
+# ----------------------------------------------------------------------
+recursion:
+  # Time window for counting repeats.
+  fingerprint_window_seconds: 60
+
+  # After this many repeats within the window, throw RecursionKilled.
+  kill_after_repeats: 5
+
+# ----------------------------------------------------------------------
+# Tool firewall — controls which tools the agent may invoke.
+#   - allowlist empty []  -> allow everything not in denylist
+#   - allowlist non-empty -> deny by default, allow only listed
+#   - denylist beats allowlist
+# ----------------------------------------------------------------------
+tools:
+  allowlist: []     # leave empty for "allow all not denied"
+  denylist:
+    - shell
+    - exec
+    - eval
+    - rm
+    - fs.unlink
+  rate_limits:
+    slack.send:
+      max_per_minute: 10
+    email.send:
+      max_per_hour: 50
+    whatsapp.send:
+      max_per_minute: 30
+
+# ----------------------------------------------------------------------
+# Webhook alerts — fired whenever a Guard event triggers.
+# Set bot_token / chat_id / webhook_url via environment variables and
+# reference them here, or paste directly (mind your secrets).
+# ----------------------------------------------------------------------
+webhook:
+  telegram:
+    enabled: false
+    on: [budget_exceeded, recursion_killed, tool_denied]
+    bot_token: ${TELEGRAM_BOT_TOKEN}
+    chat_id: ${TELEGRAM_CHAT_ID}
+  slack:
+    enabled: false
+    on: [budget_exceeded, recursion_killed]
+    webhook_url: ${SLACK_WEBHOOK_URL}
+  discord:
+    enabled: false
+    on: [budget_exceeded]
+    webhook_url: ${DISCORD_WEBHOOK_URL}
+  generic:
+    enabled: false
+    on: []
+    url: ${GUARD_GENERIC_WEBHOOK_URL}
+    headers: {}
+
+# ----------------------------------------------------------------------
+# Pricing override — defaults ship with the latest 2026-05 list rates.
+# Override only models you care about; everything else stays default.
+# Numbers are USD per 1,000,000 tokens.
+# ----------------------------------------------------------------------
+pricing: {}

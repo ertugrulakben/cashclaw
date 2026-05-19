@@ -1,7 +1,7 @@
 {
   "name": "cashclaw",
-  "version": "1.6.2",
-  "description": "Turn your OpenClaw AI agent into a money-making machine — 12 skills, audit trails, security hardened",
+  "version": "1.7.0",
+  "description": "The Agent Economy Layer — agents earn, agents spend, Guard protects. 13 skills with runtime cost cap, recursive kill, tool firewall.",
   "type": "module",
   "bin": {
     "cashclaw": "./bin/cashclaw.js"
@@ -9,24 +9,25 @@
   "main": "./src/cli/index.js",
   "scripts": {
     "start": "node bin/cashclaw.js",
-    "test": "node --test tests/cli.test.js"
+    "test": "node --test tests/cli.test.js tests/guard.test.js"
   },
   "engines": {
     "node": ">=20.0.0"
   },
   "dependencies": {
-    "commander": "^12.0.0",
-    "inquirer": "^9.0.0",
+    "boxen": "^8.0.0",
     "chalk": "^5.0.0",
+    "cli-table3": "^0.6.0",
+    "commander": "^12.0.0",
+    "dayjs": "^1.11.0",
+    "express": "^4.21.0",
+    "fs-extra": "^11.0.0",
+    "inquirer": "^9.0.0",
+    "js-yaml": "^4.1.1",
+    "open": "^10.0.0",
     "ora": "^8.0.0",
     "stripe": "^17.0.0",
-    "express": "^4.21.0",
-    "open": "^10.0.0",
-    "uuid": "^10.0.0",
-    "fs-extra": "^11.0.0",
-    "dayjs": "^1.11.0",
-    "boxen": "^8.0.0",
-    "cli-table3": "^0.6.0"
+    "uuid": "^10.0.0"
   },
   "keywords": [
     "openclaw",
@@ -43,7 +44,11 @@
     "data-scraping",
     "reputation-management",
     "cold-email",
-    "web-scraping"
+    "web-scraping",
+    "agent-guard",
+    "cost-cap",
+    "runtime-governance",
+    "agent-economy"
   ],
   "author": "Ertugrul Akben <i@ertugrulakben.com>",
   "license": "MIT",

@@ -13,7 +13,7 @@ export class MppBridge {
   }
 
   getHeaders() {
-    const headers = { 'Content-Type': 'application/json', 'User-Agent': 'CashClaw/1.6.2' };
+    const headers = { 'Content-Type': 'application/json', 'User-Agent': 'CashClaw/1.7.0' };
     if (this.apiKey) headers['X-API-Key'] = this.apiKey;
     return headers;
   }

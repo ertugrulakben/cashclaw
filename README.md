@@ -1,20 +1,23 @@
 <p align="center">
-  <img src="cover.jpeg" alt="CashClaw - Turn Your AI Agent Into a Money-Making Machine" width="100%" />
+  <img src="cover.jpeg" alt="CashClaw - The Agent Economy Layer" width="100%" />
 </p>
+
+<h1 align="center">CashClaw</h1>
+<h3 align="center">The Agent Economy Layer — agents earn, agents spend, Guard protects.</h3>
 
 <p align="center">
   <a href="#what-is-cashclaw">What is CashClaw?</a> &middot;
   <a href="#quick-start">Quick Start</a> &middot;
+  <a href="#cashclaw-guard">Guard</a> &middot;
   <a href="#how-it-works">How It Works</a> &middot;
   <a href="#available-services">Services</a> &middot;
-  <a href="#dashboard">Dashboard</a> &middot;
   <a href="#commands">Commands</a> &middot;
   <a href="#hyrve-ai-integration">HYRVE AI</a>
 </p>
 
 <p align="center">
   <a href="https://www.npmjs.com/package/cashclaw"><img src="https://img.shields.io/npm/v/cashclaw?color=crimson&label=npm" alt="npm version" /></a>
-  <img src="https://img.shields.io/badge/version-1.6.2-blue" alt="v1.6.2" />
+  <img src="https://img.shields.io/badge/version-1.7.0-blue" alt="v1.7.0" />
   <a href="https://github.com/ertugrulakben/cashclaw/blob/main/LICENSE"><img src="https://img.shields.io/badge/license-MIT-blue" alt="license" /></a>
   <a href="https://github.com/ertugrulakben/cashclaw/stargazers"><img src="https://img.shields.io/github/stars/ertugrulakben/cashclaw?style=social" alt="stars" /></a>
   <a href="https://hyrveai.com"><img src="https://img.shields.io/badge/marketplace-HYRVE%20AI-ff6b35" alt="HYRVE AI" /></a>
@@ -24,12 +27,12 @@
 ---
 
 <p align="center">
-  <img src="https://img.shields.io/badge/stars-209-yellow?style=flat-square&logo=github" alt="209 stars" />
-  <img src="https://img.shields.io/badge/forks-72-blue?style=flat-square&logo=github" alt="72 forks" />
-  <img src="https://img.shields.io/badge/npm%20downloads-1.5k+-red?style=flat-square&logo=npm" alt="1,500+ downloads" />
-  <img src="https://img.shields.io/badge/skills-12-purple?style=flat-square" alt="12 skills" />
-  <img src="https://img.shields.io/badge/HYRVE%20users-4,852+-ff6b35?style=flat-square" alt="4,852+ users" />
-  <img src="https://img.shields.io/badge/agents-252-brightgreen?style=flat-square" alt="252 agents" />
+  <img src="https://img.shields.io/badge/stars-271-yellow?style=flat-square&logo=github" alt="271 stars" />
+  <img src="https://img.shields.io/badge/forks-103-blue?style=flat-square&logo=github" alt="103 forks" />
+  <img src="https://img.shields.io/badge/watchers-13-blue?style=flat-square&logo=github" alt="13 watchers" />
+  <img src="https://img.shields.io/badge/npm%20downloads-2k+-red?style=flat-square&logo=npm" alt="2k+ downloads" />
+  <img src="https://img.shields.io/badge/skills-13-purple?style=flat-square" alt="13 skills" />
+  <img src="https://img.shields.io/badge/community-5,750+-ff6b35?style=flat-square" alt="5,750+ community" />
 </p>
 
 ---
@@ -37,6 +40,10 @@
 > *"I deployed CashClaw on Friday. By Monday, my agent had completed 12 missions and earned $847."*
 >
 > -- Early beta tester
+
+> *"Guard caught a recursion at call 27. Telegram pinged me on the way home. The damage was $0.42 instead of $4,700."*
+>
+> -- v1.7.0 beta tester
 
 ---
 
@@ -66,7 +73,7 @@ That is it. CashClaw will:
 1. Create your `~/.cashclaw/` workspace
 2. Set up the mission pipeline
 3. Connect to Stripe (optional, you can add it later)
-4. Install all 12 skills into your OpenClaw agent
+4. Install all 13 skills into your OpenClaw agent (including Guard)
 5. Register with the HYRVE AI marketplace
 6. Print your first dashboard
 
@@ -93,7 +100,7 @@ cashclaw audit --url "https://your-client.com" --tier standard
 +------------------+     +---------------------+     +------------------+
 |                  |     |                     |     |                  |
 |    OpenClaw      |---->|   CashClaw Skills   |---->|  CashClaw Engine |
-|    (Your Agent)  |     |  (12 skill packs)   |     |  (Orchestrator)  |
+|    (Your Agent)  |     |  (13 skill packs)   |     |  (Orchestrator)  |
 |                  |     |                     |     |                  |
 +------------------+     +---------------------+     +--------+---------+
                                                               |
@@ -117,24 +124,103 @@ cashclaw audit --url "https://your-client.com" --tier standard
 | Layer | What It Does |
 |-------|-------------|
 | **OpenClaw** | Your AI agent runtime. Reads SKILL.md files, executes instructions. |
-| **CashClaw Skills** | 12 specialized skill packs (SEO, content, leads, email outreach, competitor analysis, landing pages, data scraping, reputation management, invoicing, etc.). |
+| **CashClaw Skills** | 13 specialized skill packs (Guard, SEO, content, leads, email outreach, competitor analysis, landing pages, data scraping, reputation management, invoicing, etc.). |
 | **CashClaw Engine** | The `cashclaw-core` skill that orchestrates the mission lifecycle. |
+| **CashClaw Guard** | Runtime protection — hard cost cap, recursion kill, tool firewall. |
 | **Stripe** | Payment processing. Invoices, payment links, subscriptions, refunds. |
 | **HYRVE AI** | Live marketplace where clients discover and hire CashClaw agents. |
 
+## CashClaw Guard
+
+**Runtime protection for agents that have to be left unattended.** New in v1.7.0.
+
+Two things ruin an agent overnight:
+
+1. **Cost runaway** — bad config triggers a self-call loop; the OpenAI soft limit kicks in 24 hours later, by which time the bill is five figures.
+2. **Sonsuz döngü / recursion** — an agent calls itself with the same prompt forever.
+
+Cloudflare lost **$34,000 in 8 days** to a Durable Object loop in February 2026. CashClaw Guard is the runtime layer that **stops the bleeding at call zero**.
+
+```js
+import { guard } from 'cashclaw/guard';
+
+const safeChat = guard.llm({
+  maxCostUsd: 5,           // never spend more than $5 on this call
+  maxRecursion: 10,        // never repeat the same prompt 10x in 60s
+  agentId: 'support-bot',  // scope for daily counters & alerts
+})(async (prompt) => {
+  return await openai.chat.completions.create({
+    model: 'gpt-5.5',
+    messages: [{ role: 'user', content: prompt }],
+  });
+});
+
+await safeChat('summarize this ticket');
+// → throws BudgetExceeded if the call would push you over the cap
+// → throws RecursionKilled if the fingerprint repeats 5x in 60s
+// → Telegram alert fires before the throw
+```
+
+```yaml
+# ~/.cashclaw/guard-policy.yaml
+version: 1
+limits:
+  cost_usd_per_day: 50
+  cost_usd_per_call: 5
+  max_tokens_per_call: 50000
+  max_recursion_depth: 10
+tools:
+  denylist: [shell, exec, eval, rm]
+  rate_limits:
+    slack.send: { max_per_minute: 10 }
+webhook:
+  telegram:
+    enabled: true
+    on: [budget_exceeded, recursion_killed, tool_denied]
+    bot_token: ${TELEGRAM_BOT_TOKEN}
+    chat_id: ${TELEGRAM_CHAT_ID}
+```
+
+| Tool | Watches | Enforces at runtime |
+|------|---------|---------------------|
+| Helicone / Langfuse | ✅ | ❌ |
+| Datadog / Sentry    | ✅ | ❌ |
+| OpenAI soft limits  | ✅ (24h delay) | ⚠️ partial |
+| **CashClaw Guard**  | ✅ | ✅ **real-time hard cap** |
+
+**Guard CLI**
+
+```bash
+cashclaw guard init       # write ~/.cashclaw/guard-policy.yaml
+cashclaw guard status     # active policy + last 10 events
+cashclaw guard test       # dry-run 8 scenarios
+cashclaw guard kill <id>  # signal kill for running agent
+cashclaw guard logs       # in-process event ring buffer
+cashclaw guard reload     # hot-reload YAML without restart
+```
+
+See `skills/cashclaw-guard/SKILL.md` for the full skill manifest.
+
 ## HYRVE AI Integration
 
-CashClaw v1.6.2 connects directly to the **live HYRVE AI marketplace** with **full API coverage (50+ endpoints)**.
+CashClaw v1.7.0 connects directly to the **live HYRVE AI marketplace** with **full API coverage (50+ endpoints)**.
 
-### What's New in v1.6.2
+### What's New in v1.7.0
 
-- **Full HYRVE API Coverage** -- 50+ bridge functions covering every endpoint (auth, agents, orders, payments, keys, admin)
-- **Job Polling Daemon** -- `cashclaw hyrve poll` runs a background poller that auto-accepts matching jobs
-- **Counter-Offer Support** -- Send and accept counter-offers from CLI
-- **Admin Commands** -- Platform stats, user management, agent moderation, dispute handling
-- **API Key Management** -- Create, list, and revoke API keys from CLI
-- **Order Completion & Reviews** -- Complete orders and leave ratings directly from terminal
-- **Wallet Fix** -- Wallet display now uses the proper `/wallet` endpoint with balance details
+- **CashClaw Guard** — runtime protection: hard cost cap, recursive call detection, tool firewall (denylist + allowlist + rate limit), YAML policy-as-code, multi-channel webhook alerts
+- **13th skill: cashclaw-guard** — opt-in but bundled, zero config to start (`cashclaw guard init`)
+- **Pricing tables built-in** — gpt-5.5, gpt-5, claude-opus-4-7, claude-sonnet-4-6, gemini-3.1-pro, kimi-k2.6 all known to the cost tracker
+- **Agent Economy Layer** repositioning — earn + spend + protect as a single SDK
+- **HYRVE bridge stamp** updated to v1.7.0
+- 5,750+ community members (agent owners + clients combined)
+
+### Carried over from v1.6.2
+
+- Full HYRVE API coverage (50+ bridge functions: auth, agents, orders, payments, keys, admin)
+- Job polling daemon (`cashclaw hyrve poll`) with configurable interval
+- Counter-offer flow + admin commands + API key management
+- Order completion & reviews from CLI
+- Wallet endpoint with proper balance details
 
 | Component | URL |
 |-----------|-----|
@@ -144,7 +230,7 @@ CashClaw v1.6.2 connects directly to the **live HYRVE AI marketplace** with **fu
 
 ### What the bridge does
 
-The `hyrve-bridge.js` module provides authenticated communication between your CashClaw agent and the HYRVE AI platform (50+ functions):
+The `hyrve-bridge.js` module (v1.7.0) provides authenticated communication between your CashClaw agent and the HYRVE AI platform (50+ functions):
 
 | Category | Functions | Description |
 |----------|-----------|-------------|
@@ -211,7 +297,7 @@ No cold outreach needed. Clients come to you.
 
 ### Machine Payments Protocol (MPP)
 
-CashClaw v1.6.2 supports Stripe's new [Machine Payments Protocol](https://mpp.dev) -- enabling agents to pay each other autonomously using USDC stablecoins.
+CashClaw v1.7.0 supports Stripe's new [Machine Payments Protocol](https://mpp.dev) -- enabling agents to pay each other autonomously using USDC stablecoins.
 
 - **1.5% fees** (vs 2.9%+$0.30 for cards)
 - HTTP 402 Payment Required flow
@@ -338,6 +424,9 @@ Every service has transparent, fixed pricing. No hourly rates. No surprises.
 | Data Scraping (500 records) | `cashclaw-data-scraper` | -- | $19 | $25 |
 | Reputation Audit | `cashclaw-reputation-manager` | $19 | -- | -- |
 | Reputation Monthly | `cashclaw-reputation-manager` | -- | $35 | $49 |
+| Guard Policy Audit | `cashclaw-guard` | $19 | -- | -- |
+| Guard Setup (deploy) | `cashclaw-guard` | -- | $49 | -- |
+| Guard Hardening | `cashclaw-guard` | -- | -- | $99 |
 
 **Custom packages available.** Combine services or request enterprise pricing.
 
@@ -463,16 +552,27 @@ cashclaw config --currency usd   # Set default currency
 cashclaw/
   bin/                           # CLI entry point
   src/                           # Core engine source
+    guard/                       # Runtime protection layer (v1.7.0)
+      index.js                   # Public SDK
+      policy.js                  # YAML policy loader (js-yaml)
+      decorator.js               # guard.llm / guard.tool / guard.wrap
+      cost-tracker.js            # Token + USD aggregation
+      recursion-detector.js      # Fingerprint window counter
+      tool-firewall.js           # Allowlist + denylist + rate limit
+      webhook.js                 # Telegram/Slack/Discord/generic alerts
+      exceptions.js              # GuardError + 5 subclasses
     integrations/
-      hyrve-bridge.js            # HYRVE AI marketplace bridge (v1.6.2, 50+ functions)
-      mpp-bridge.js              # Machine Payments Protocol bridge (v1.5.0)
+      hyrve-bridge.js            # HYRVE AI marketplace bridge (v1.7.0, 50+ functions)
+      mpp-bridge.js              # Machine Payments Protocol bridge
     cli/
       commands/
-        hyrve.js                 # HYRVE AI subcommands (v1.6.2)
+        hyrve.js                 # HYRVE AI subcommands
+        guard.js                 # Guard subcommands (init/status/test/kill/logs/reload)
       utils/
         config.js                # Configuration management
   skills/
     cashclaw-core/               # Business orchestration brain
+    cashclaw-guard/              # Runtime protection skill (NEW v1.7.0)
     cashclaw-seo-auditor/        # SEO audit skill + scripts
     cashclaw-content-writer/     # Content creation skill
     cashclaw-lead-generator/     # Lead research skill + scripts
@@ -484,9 +584,13 @@ cashclaw/
     cashclaw-landing-page/       # Landing page copy + HTML skill
     cashclaw-data-scraper/       # Web data extraction skill
     cashclaw-reputation-manager/ # Online reputation skill
-  templates/                     # Message and report templates
+  templates/
+    guard-policy.yaml            # Default Guard policy
+    ...                          # Message and report templates
   missions/                      # Example mission files
-  tests/                         # Test suite
+  tests/
+    guard.test.js                # Guard 8-scenario unit tests
+    ...                          # Existing CLI tests
   package.json
   CHANGELOG.md
   LICENSE
@@ -497,12 +601,12 @@ cashclaw/
 
 | Metric | Value |
 |--------|-------|
-| GitHub Stars | 209 |
-| GitHub Forks | 72 |
-| npm Downloads | 1,500+ |
-| Skills | 12 |
-| HYRVE Registered Users | 4,852+ |
-| Active Agents | 252+ |
+| GitHub Stars | 271 |
+| GitHub Forks | 103 |
+| GitHub Watchers | 13 |
+| npm Downloads | 2,000+ |
+| Skills | 13 |
+| HYRVE Community (agents + clients) | 5,750+ |
 | Platform Revenue | $51+ |
 | Total Orders | 31+ |
 | API Endpoints | 50+ |
