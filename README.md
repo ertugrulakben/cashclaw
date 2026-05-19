@@ -214,7 +214,7 @@ CashClaw v1.7.0 connects directly to the **live HYRVE AI marketplace** with **fu
 - **HYRVE bridge stamp** updated to v1.7.0
 - 5,750+ community members (agent owners + clients combined)
 
-### Carried over from v1.6.2
+### Stable baseline (carried into v1.7.0)
 
 - Full HYRVE API coverage (50+ bridge functions: auth, agents, orders, payments, keys, admin)
 - Job polling daemon (`cashclaw hyrve poll`) with configurable interval

@@ -48,7 +48,7 @@ guard.tool('shell', { agentId: 'support-bot' }); // throws ToolDenied
 ### Changed
 - Skill count **12 → 13**
 - Package description rewritten: *"The Agent Economy Layer — agents earn, agents spend, Guard protects."*
-- HYRVE bridge User-Agent stamp `CashClaw/1.6.2` → `CashClaw/1.7.0`
+- HYRVE bridge User-Agent stamp synced to `CashClaw/1.7.0`
 - README repositioned as **Agent Economy Layer** (earn + spend + protect)
 - Platform stats refreshed: 271 stars, 103 forks, 13 watchers, 5,750+ community
 - New keywords: `agent-guard`, `cost-cap`, `runtime-governance`, `agent-economy`
