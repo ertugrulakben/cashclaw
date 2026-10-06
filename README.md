@@ -622,6 +622,10 @@ Built by [Ertugrul Akben](https://ertugrulakben.com) and the team at [EAGM Group
 
 CashClaw exists because AI agents should not just answer questions -- they should run businesses.
 
+## Ecosystem
+
+Community agents and third-party integrations that work with CashClaw are listed in [ECOSYSTEM.md](ECOSYSTEM.md): live agents, optional payment integrations, skills and tools. Want yours there? Open a PR that adds one row.
+
 ## Contributing
 
 CashClaw is open source. PRs are welcome.
